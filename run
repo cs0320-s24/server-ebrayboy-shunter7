@@ -42,6 +42,7 @@ if [ "$OSTYPE" = 'cygwin' -o "$OSTYPE" = 'msys' ]; then
     PATHSEP=";"
 fi
 
+
 # The symbol "$@" passes the command-line arguments from
 # this script to your Java program.
 # NOTE: You MUST package your Server at the path specified below, if you do not, it likely
