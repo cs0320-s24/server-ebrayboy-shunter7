@@ -1,11 +1,11 @@
-package edu.brown.cs.student;
+package edu.brown.cs.student.csv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.brown.cs.student.main.Astro;
-import edu.brown.cs.student.main.Builder;
-import edu.brown.cs.student.main.CSVParser;
-import edu.brown.cs.student.main.FactoryFailureException;
+import edu.brown.cs.student.main.csv.Astro;
+import edu.brown.cs.student.main.csv.Builder;
+import edu.brown.cs.student.main.csv.CSVParser;
+import edu.brown.cs.student.main.csv.FactoryFailureException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;

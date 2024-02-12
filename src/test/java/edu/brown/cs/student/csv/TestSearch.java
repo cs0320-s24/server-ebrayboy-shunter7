@@ -1,9 +1,9 @@
-package edu.brown.cs.student;
+package edu.brown.cs.student.csv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.brown.cs.student.main.FactoryFailureException;
-import edu.brown.cs.student.main.Util;
+import edu.brown.cs.student.main.csv.FactoryFailureException;
+import edu.brown.cs.student.main.csv.Util;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
