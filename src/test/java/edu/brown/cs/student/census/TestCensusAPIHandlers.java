@@ -1,4 +1,3 @@
 package edu.brown.cs.student.census;
 
-public class TestCensusAPIHandlers {
-}
+public class TestCensusAPIHandlers {}

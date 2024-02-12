@@ -1,4 +1,3 @@
 package edu.brown.cs.student.main.server;
 
-public class CensusHandler {
-}
+public class CensusHandler {}
