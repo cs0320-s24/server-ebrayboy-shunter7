@@ -1,5 +1,6 @@
 package edu.brown.cs.student.main.csv;
 
+import edu.brown.cs.student.main.csv.search.Search;
 import java.io.IOException;
 import java.util.List;
 
