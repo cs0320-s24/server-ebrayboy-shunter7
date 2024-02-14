@@ -16,7 +16,8 @@ public class Server {
         });
 
     // Setting up the handler for the GET /order and /activity endpoints
-    Spark.get("loadcsv", new LoadHandler());
+    LoadHandler loadHandler = new LoadHandler();
+    Spark.get("loadcsv", loadHandler);
     Spark.init();
     Spark.awaitInitialization();
 
