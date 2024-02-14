@@ -12,7 +12,11 @@ import java.util.List;
 
 public class LoadHandler implements Route {
 
-  public List<ArrayList<String>> loadedCSV;
+  private List<ArrayList<String>> loadedCSV;
+
+  public List<ArrayList<String>> getLoadedCSV() {
+    return loadedCSV;
+  }
 
   public Object handle(Request request, Response response) {
     String filePath = request.queryParams("filePath");
