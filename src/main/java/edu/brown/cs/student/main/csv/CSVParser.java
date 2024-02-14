@@ -16,7 +16,7 @@ public class CSVParser<T> {
   Reader reader;
   CreatorFromRow<T> creator;
   Boolean hasHeaders;
-  List<String> headerList;
+  public List<String> headerList;
 
   /**
    * @param reader A Reader that contains the file information that is inputted
