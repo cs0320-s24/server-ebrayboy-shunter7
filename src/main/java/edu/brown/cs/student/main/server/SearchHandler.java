@@ -4,16 +4,15 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.csv.FactoryFailureException;
 import edu.brown.cs.student.main.csv.search.SearchCSV;
-import kotlin.Pair;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import kotlin.Pair;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public class SearchHandler implements Route {
   private final Pair<List<List<String>>, List<String>> parsedCSV;

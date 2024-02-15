@@ -1,13 +1,12 @@
 package edu.brown.cs.student.csv;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import edu.brown.cs.student.main.csv.FactoryFailureException;
 import edu.brown.cs.student.main.csv.Util;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class TestSearch {
 
