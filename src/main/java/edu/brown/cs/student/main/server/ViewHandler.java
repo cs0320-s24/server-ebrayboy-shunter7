@@ -6,35 +6,31 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ViewHandler implements Route {
 
-  private List<ArrayList<String>> parsedCSV;
+  private final List<List<String>> parsedCSV;
 
-  public ViewHandler(List<ArrayList<String>> parsedCSV) {
+  public ViewHandler(List<List<String>> parsedCSV) {
     this.parsedCSV = parsedCSV;
+  }
+
+  public List<List<String>> getParsedCSV() {
+    return parsedCSV;
   }
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
-    System.out.println(this.parsedCSV);
     if (this.parsedCSV == null || this.parsedCSV.isEmpty()) {
       return new ViewFailResponse().serialize();
     }
 
-    Map<String, Object> responseMap = new HashMap<>();
-
-    responseMap.put("csv", this.parsedCSV);
-
-    return new ViewSuccessResponse(responseMap).serialize();
+    return new ViewSuccessResponse(this.getParsedCSV()).serialize();
   }
 
-  private record ViewSuccessResponse(String result, Map<String, Object> data) {
-    public ViewSuccessResponse(Map<String, Object> data) {
+  public record ViewSuccessResponse(String result, List<List<String>> data) {
+    public ViewSuccessResponse(List<List<String>> data) {
       this("success", data);
     }
 
@@ -42,6 +38,7 @@ public class ViewHandler implements Route {
       try {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<ViewSuccessResponse> adapter = moshi.adapter(ViewSuccessResponse.class);
+
         return adapter.toJson(this);
       } catch (Exception e) {
 
@@ -51,7 +48,7 @@ public class ViewHandler implements Route {
     }
   }
 
-  private record ViewFailResponse(String result) {
+  public record ViewFailResponse(String result) {
     public ViewFailResponse() {
       this("error_datasource");
     }

@@ -1,11 +1,15 @@
 package edu.brown.cs.student.main.server;
 
-import static spark.Spark.after;
-
 import spark.Spark;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import static spark.Spark.after;
+
 public class Server {
-  public static void main(String[] args) {
+  public static void main(String[] args)
+      throws URISyntaxException, IOException, InterruptedException {
     int port = 3232;
     Spark.port(port);
 
@@ -18,8 +22,14 @@ public class Server {
     // Setting up the handler for the GET /order and /activity endpoints
     LoadHandler loadHandler = new LoadHandler();
     Spark.get("loadcsv", loadHandler);
+    CensusHandler censusHandler = new CensusHandler();
+    censusHandler.getStateCodes();
+    Spark.get("broadband", censusHandler);
     Spark.get(
-        "viewcsv", (req, res) -> new ViewHandler(loadHandler.getLoadedCSV()).handle(req, res));
+        "viewcsv",
+        (req, res) -> new ViewHandler(loadHandler.getLoadedCSV().getFirst()).handle(req, res));
+    Spark.get(
+        "searchcsv", (req, res) -> new SearchHandler(loadHandler.getLoadedCSV()).handle(req, res));
     Spark.init();
     Spark.awaitInitialization();
 

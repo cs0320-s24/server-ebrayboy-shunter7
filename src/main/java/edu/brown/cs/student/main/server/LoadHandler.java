@@ -3,18 +3,18 @@ package edu.brown.cs.student.main.server;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.csv.load.LoadCSV;
+import kotlin.Pair;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LoadHandler implements Route {
 
-  private List<ArrayList<String>> loadedCSV;
+  private Pair<List<List<String>>, List<String>> loadedCSV;
 
-  public List<ArrayList<String>> getLoadedCSV() {
+  public Pair<List<List<String>>, List<String>> getLoadedCSV() {
     return loadedCSV;
   }
 
@@ -29,7 +29,7 @@ public class LoadHandler implements Route {
     try {
       this.loadedCSV = this.sendRequest(filePath, Boolean.parseBoolean(hasHeader));
 
-      if (this.loadedCSV.isEmpty()) {
+      if (this.loadedCSV.getSecond().isEmpty()) {
         return new LoadFailureResponse("error_datasource").serialize();
       }
 
@@ -41,8 +41,10 @@ public class LoadHandler implements Route {
     }
   }
 
-  private List<ArrayList<String>> sendRequest(String filePath, boolean hasHeader) {
-    return new LoadCSV(filePath, hasHeader).parseCSV();
+  public Pair<List<List<String>>, List<String>> sendRequest(String filePath, boolean hasHeader) {
+    LoadCSV loadcsv = new LoadCSV(filePath, hasHeader);
+
+    return new Pair<>(loadcsv.parseCSV(), loadcsv.headerList);
   }
 
   public record LoadSuccessResponse(String result, String filepath) {
