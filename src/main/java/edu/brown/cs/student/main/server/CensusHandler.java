@@ -5,10 +5,6 @@ import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import edu.brown.cs.student.main.census.Census;
 import edu.brown.cs.student.main.census.CensusAPIUtilities;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -20,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;

@@ -1,10 +1,9 @@
 package edu.brown.cs.student.census;
 
 import edu.brown.cs.student.main.server.CensusHandler;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.junit.jupiter.api.Test;
 
 public class TestCensusAPIHandlers {
   @Test

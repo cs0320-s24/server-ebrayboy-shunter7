@@ -2,11 +2,13 @@ package edu.brown.cs.student.main.server;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import java.util.List;
 
 public class ViewHandler implements Route {
 
@@ -16,21 +18,23 @@ public class ViewHandler implements Route {
     this.parsedCSV = parsedCSV;
   }
 
-  public List<List<String>> getParsedCSV() {
-    return parsedCSV;
-  }
-
   @Override
   public Object handle(Request request, Response response) throws Exception {
+
     if (this.parsedCSV == null || this.parsedCSV.isEmpty()) {
       return new ViewFailResponse().serialize();
     }
 
-    return new ViewSuccessResponse(this.getParsedCSV()).serialize();
+    List<List<String>> cleanedData = cleanParsedCSVData(this.parsedCSV);
+
+    Map<String, Object> responseMap = new HashMap<>();
+    responseMap.put("data", cleanedData);
+
+    return new ViewSuccessResponse(responseMap).serialize();
   }
 
-  public record ViewSuccessResponse(String result, List<List<String>> data) {
-    public ViewSuccessResponse(List<List<String>> data) {
+  public record ViewSuccessResponse(String result, Map<String, Object> response) {
+    public ViewSuccessResponse(Map<String, Object> data) {
       this("success", data);
     }
 
@@ -64,5 +68,18 @@ public class ViewHandler implements Route {
         throw e;
       }
     }
+  }
+
+  private List<List<String>> cleanParsedCSVData(List<List<String>> originalData) {
+    return originalData.stream()
+        .map(list -> list.stream().map(this::removeQuotesFromString).collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  private String removeQuotesFromString(String input) {
+    if (input.startsWith("\"") && input.endsWith("\"")) {
+      return input.substring(1, input.length() - 1);
+    }
+    return input;
   }
 }

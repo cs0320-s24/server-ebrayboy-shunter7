@@ -10,7 +10,10 @@ import spark.Response;
 import spark.Route;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SearchHandler implements Route {
   private final Pair<List<List<String>>, List<String>> parsedCSV;
@@ -24,6 +27,8 @@ public class SearchHandler implements Route {
     if (this.parsedCSV.getFirst() == null || this.parsedCSV.getFirst().isEmpty()) {
       return new SearchFailResponse().serialize();
     }
+
+    Map<String, Object> responseMap = new HashMap<>();
 
     String searchTarget = request.queryParams("searchTarget");
     String columnID = request.queryParams("columnID");
@@ -51,14 +56,17 @@ public class SearchHandler implements Route {
         searchResultsJson =
             this.sendRequest(searchTarget, columnIDStr, Boolean.parseBoolean(hasHeader));
       } else if (columnIDInt != null) {
+
         searchResultsJson =
             this.sendRequest(searchTarget, columnIDInt, Boolean.parseBoolean(hasHeader));
       } else {
-        searchResultsJson =
-            this.sendRequest(searchTarget, columnIDStr, Boolean.parseBoolean(hasHeader));
+
+        searchResultsJson = this.sendRequest(searchTarget, Boolean.parseBoolean(hasHeader));
       }
 
-      return new SearchSuccessResponse(searchResultsJson).serialize();
+      responseMap.put("data", searchResultsJson);
+
+      return new SearchSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
       e.printStackTrace();
 
@@ -69,18 +77,42 @@ public class SearchHandler implements Route {
   public List<List<String>> sendRequest(String searchTarget, String columnID, boolean hasHeader)
       throws IOException, FactoryFailureException {
 
-    return new SearchCSV(this.parsedCSV, searchTarget, columnID, hasHeader).search();
+    List<List<String>> cleanedParsedCSV = cleanParsedCSVData(this.parsedCSV.getFirst());
+
+    return new SearchCSV(
+            new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()),
+            searchTarget,
+            columnID,
+            hasHeader)
+        .search();
   }
 
   public List<List<String>> sendRequest(String searchTarget, Integer columnID, boolean hasHeader)
       throws IOException, FactoryFailureException {
 
-    return new SearchCSV(this.parsedCSV, searchTarget, columnID, hasHeader).search();
+    List<List<String>> cleanedParsedCSV = cleanParsedCSVData(this.parsedCSV.getFirst());
+
+    return new SearchCSV(
+            new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()),
+            searchTarget,
+            columnID,
+            hasHeader)
+        .search();
   }
 
-  public record SearchSuccessResponse(String result, List<List<String>> data) {
-    public SearchSuccessResponse(List<List<String>> data) {
-      this("success", data);
+  public List<List<String>> sendRequest(String searchTarget, boolean hasHeader)
+      throws IOException, FactoryFailureException {
+
+    List<List<String>> cleanedParsedCSV = cleanParsedCSVData(this.parsedCSV.getFirst());
+
+    return new SearchCSV(
+            new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()), searchTarget, hasHeader)
+        .search();
+  }
+
+  public record SearchSuccessResponse(String result, Map<String, Object> response) {
+    public SearchSuccessResponse(Map<String, Object> response) {
+      this("success", response);
     }
 
     String serialize() {
@@ -113,5 +145,18 @@ public class SearchHandler implements Route {
         throw e;
       }
     }
+  }
+
+  private List<List<String>> cleanParsedCSVData(List<List<String>> originalData) {
+    return originalData.stream()
+        .map(list -> list.stream().map(this::removeQuotesFromString).collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  private String removeQuotesFromString(String input) {
+    if (input.startsWith("\"") && input.endsWith("\"")) {
+      return input.substring(1, input.length() - 1);
+    }
+    return input;
   }
 }

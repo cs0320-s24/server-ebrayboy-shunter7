@@ -1,12 +1,13 @@
 package edu.brown.cs.student.csv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import edu.brown.cs.student.main.csv.FactoryFailureException;
 import edu.brown.cs.student.main.csv.Util;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSearch {
 
@@ -15,13 +16,13 @@ public class TestSearch {
     Util testBasic =
         new Util(
             "/Users/sanya/cs0320/server-ebrayboy-shunter7/data/census/income_by_race.csv",
-            "White",
+            "asian",
             1,
             true);
     List<List<String>> getResults = testBasic.getResults();
     assertEquals(40, testBasic.getResults().size());
     for (List<String> ele : getResults) {
-      assertEquals("White", ele.get(1));
+      assertEquals("Asian", ele.get(1));
     }
   }
 

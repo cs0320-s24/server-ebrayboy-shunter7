@@ -3,12 +3,11 @@ package edu.brown.cs.student.main.server;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.csv.load.LoadCSV;
+import java.util.List;
 import kotlin.Pair;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import java.util.List;
 
 public class LoadHandler implements Route {
 

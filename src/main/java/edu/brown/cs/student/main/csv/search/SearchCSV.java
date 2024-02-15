@@ -2,11 +2,10 @@ package edu.brown.cs.student.main.csv.search;
 
 import edu.brown.cs.student.main.csv.CreatorFromRow;
 import edu.brown.cs.student.main.csv.FactoryFailureException;
-import kotlin.Pair;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import kotlin.Pair;
 
 /** This is a search class that is responsible for searching the parsed data of a CSV file */
 public class SearchCSV implements CreatorFromRow<List<String>> {
@@ -93,7 +92,7 @@ public class SearchCSV implements CreatorFromRow<List<String>> {
 
       if (this.columnIDString != null) {
         for (int index = 0; index < headerList.size(); index++) {
-          if (headerList.get(index).equals(this.columnIDString)) {
+          if (headerList.get(index).equalsIgnoreCase(this.columnIDString)) {
             columnIndex = index;
           }
         }
@@ -108,13 +107,13 @@ public class SearchCSV implements CreatorFromRow<List<String>> {
       // this is the case in which we know which column to look at
       if (!searchAll) {
         // check columnindex slot, check if isEquals to searchTarget
-        if (row.get(columnIndex).equals(this.searchTarget)) {
+        if (row.get(columnIndex).toLowerCase().contains(this.searchTarget.toLowerCase())) {
           searchResults.add(row);
         }
       } else {
         // case for in which we need to search every column
         for (String string : row) {
-          if (string.equals(this.searchTarget)) {
+          if (string.toLowerCase().contains(this.searchTarget.toLowerCase())) {
             searchResults.add(row);
             break;
           }

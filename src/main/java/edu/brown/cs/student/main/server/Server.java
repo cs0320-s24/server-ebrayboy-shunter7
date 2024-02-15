@@ -1,11 +1,10 @@
 package edu.brown.cs.student.main.server;
 
-import spark.Spark;
+import static spark.Spark.after;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-
-import static spark.Spark.after;
+import spark.Spark;
 
 public class Server {
   public static void main(String[] args)
