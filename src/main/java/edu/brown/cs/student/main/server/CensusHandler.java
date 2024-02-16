@@ -22,9 +22,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Handles Census-related requests and implements the Route interface.
+ */
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;
 
+  /**
+   * Handles the Census-related request.
+   *
+   * @param request  HTTP request
+   * @param response HTTP response
+   * @return Result of handling the request
+   * @throws Exception if an error occurs during handling
+   */
   @Override
   public Object handle(Request request, Response response) throws Exception {
     Set<String> params = request.queryParams();
@@ -62,6 +73,16 @@ public class CensusHandler implements Route {
     }
   }
 
+  /**
+   * Sends a request to the Census API and retrieves data.
+   *
+   * @param state  State code
+   * @param county County code
+   * @return List of lists containing Census data
+   * @throws URISyntaxException   if the URI is malformed
+   * @throws IOException          if an I/O error occurs
+   * @throws InterruptedException if the operation is interrupted
+   */
   public List<List<String>> sendRequest(String state, String county)
       throws URISyntaxException, IOException, InterruptedException {
 
@@ -92,11 +113,25 @@ public class CensusHandler implements Route {
     return cleanParsedCSVData(data);
   }
 
+  /**
+   * Represents a successful response for Census data with a specific result and response map.
+   */
   public record CensusSuccessResponse(String result, Map<String, Object> response) {
+    /**
+     * Constructs a CensusSuccessResponse with the provided response map, setting the result to
+     * "success".
+     *
+     * @param response Map containing response data
+     */
     public CensusSuccessResponse(Map<String, Object> response) {
       this("success", response);
     }
 
+    /**
+     * Serializes the CensusSuccessResponse to a JSON string using Moshi.
+     *
+     * @return JSON representation of the CensusSuccessResponse
+     */
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
@@ -111,11 +146,22 @@ public class CensusHandler implements Route {
     }
   }
 
+  /**
+   * Represents a failed response for Census data with a specific result.
+   */
   public record CensusFailResponse(String result) {
+    /**
+     * Constructs a CensusFailResponse with the default result "error_datasource".
+     */
     public CensusFailResponse() {
       this("error_datasource");
     }
 
+    /**
+     * Serializes the CensusFailResponse to a JSON string using Moshi.
+     *
+     * @return JSON representation of the CensusFailResponse
+     */
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
@@ -129,6 +175,13 @@ public class CensusHandler implements Route {
     }
   }
 
+  /**
+   * Retrieves state codes from the Census API and populates the stateCodes map.
+   *
+   * @throws URISyntaxException   if the URI is malformed
+   * @throws IOException          if an I/O error occurs
+   * @throws InterruptedException if the operation is interrupted
+   */
   public void getStateCodes() throws URISyntaxException, IOException, InterruptedException {
     HttpRequest buildCensusApiRequest =
         HttpRequest.newBuilder()
@@ -153,6 +206,16 @@ public class CensusHandler implements Route {
     this.stateCodes = codes;
   }
 
+  /**
+   * Finds the Census county code based on the state code and county name.
+   *
+   * @param stateCode  State code
+   * @param countyName County name
+   * @return Census county code
+   * @throws URISyntaxException   if the URI is malformed
+   * @throws IOException          if an I/O error occurs
+   * @throws InterruptedException if the operation is interrupted
+   */
   public static String findCountyCode(String stateCode, String countyName)
       throws URISyntaxException, IOException, InterruptedException {
     HttpRequest request =
@@ -179,12 +242,24 @@ public class CensusHandler implements Route {
     return "";
   }
 
+  /**
+   * Cleans the parsed CSV data by removing quotes from string elements.
+   *
+   * @param originalData Original data with quotes
+   * @return Cleaned data without quotes
+   */
   private List<List<String>> cleanParsedCSVData(List<List<String>> originalData) {
     return originalData.stream()
         .map(list -> list.stream().map(this::removeQuotesFromString).collect(Collectors.toList()))
         .collect(Collectors.toList());
   }
 
+  /**
+   * Removes quotes from the beginning and end of a string.
+   *
+   * @param input Input string with quotes
+   * @return String without quotes
+   */
   private String removeQuotesFromString(String input) {
     if (input.startsWith("\"") && input.endsWith("\"")) {
       return input.substring(1, input.length() - 1);

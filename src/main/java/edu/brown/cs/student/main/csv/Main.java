@@ -3,7 +3,9 @@ package edu.brown.cs.student.main.csv;
 import java.io.IOException;
 import java.util.List;
 
-/** The Main class of our project. This is where execution begins. */
+/**
+ * The Main class of our project. This is where execution begins.
+ */
 public final class Main {
   /**
    * The initial method called when execution begins.
@@ -67,11 +69,5 @@ public final class Main {
   }
 
   private void run() throws IOException, FactoryFailureException {
-    // dear student: you can remove this. you can remove anything. you're in cs32. you're free!
-
-    //    System.out.println(
-    //        "Your horoscope for this project:\n"
-    //            + "Entrust in the Strategy pattern, and it shall give thee the sovereignty to "
-    //            + "decide and the dexterity to change direction in the realm of thy code.");
   }
 }

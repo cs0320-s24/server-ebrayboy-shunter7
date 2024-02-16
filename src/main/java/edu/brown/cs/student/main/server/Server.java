@@ -1,14 +1,26 @@
 package edu.brown.cs.student.main.server;
 
-import static spark.Spark.after;
-
 import edu.brown.cs.student.main.census.CacheProxy;
 import edu.brown.cs.student.main.census.CachingCensusDatasource;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import spark.Spark;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import static spark.Spark.after;
+
+/**
+ * Represents the main class for the server, defining routes and initializing Spark.
+ */
 public class Server {
+  /**
+   * Main method to start the server, set up routes, and initialize Spark.
+   *
+   * @param args Command-line arguments (not used in this implementation).
+   * @throws URISyntaxException   If there is an issue with URI syntax.
+   * @throws IOException          If there is an I/O related issue.
+   * @throws InterruptedException If the execution is interrupted.
+   */
   public static void main(String[] args)
       throws URISyntaxException, IOException, InterruptedException {
     int port = 3232;
@@ -20,7 +32,6 @@ public class Server {
           response.header("Access-Control-Allow-Methods", "*");
         });
 
-    // Setting up the handler for the GET /order and /activity endpoints
     LoadHandler loadHandler = new LoadHandler();
     Spark.get("loadcsv", loadHandler);
     CensusHandler censusHandler = new CensusHandler();
@@ -34,7 +45,6 @@ public class Server {
     Spark.init();
     Spark.awaitInitialization();
 
-    // Notice this link alone leads to a 404... Why is that?
     System.out.println("Server started at http://localhost:" + port);
   }
 }

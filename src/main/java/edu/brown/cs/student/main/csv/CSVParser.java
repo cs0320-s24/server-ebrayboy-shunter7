@@ -8,8 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @param <T> Parser Class, with T representing an Arbitrary Object where the user would like the
- *     data stored.
+ * Generic CSV Parser class that reads data from a given Reader, uses a provided CreatorFromRow
+ * to convert each row into an arbitrary object of type T, and supports handling headers based on
+ * the specified hasHeaders flag.
+ *
+ * @param <T> The type of object where the parsed data is stored.
  */
 public class CSVParser<T> {
 
@@ -19,24 +22,26 @@ public class CSVParser<T> {
   public List<String> headerList;
 
   /**
-   * @param reader A Reader that contains the file information that is inputted
-   * @param creator An Object, in which the data is stored in, defined by whoever is using the
-   *     method
-   * @param hasHeaders A boolean representing weather or not the inputted file has headers
+   * Constructs a CSVParser.
+   *
+   * @param reader     A Reader containing the file information.
+   * @param creator    An object creator defining how data is stored in the target type T.
+   * @param hasHeaders A boolean representing whether or not the inputted file has headers.
    */
   public CSVParser(Reader reader, CreatorFromRow<T> creator, Boolean hasHeaders) {
     this.reader = reader;
     this.creator = creator;
     this.hasHeaders = hasHeaders;
   }
-  ;
 
   /**
-   * @return A list of objects determined by the user that stores all of the data
-   * @throws IOException
-   * @throws FactoryFailureException
+   * Parses the CSV data, converting each row into objects of type T.
+   *
+   * @return A list of objects determined by the user that stores all of the data.
+   * @throws IOException             If there is an issue with I/O operations.
+   * @throws FactoryFailureException If there is a failure during factory operation.
    */
-  public List<T> Parse() throws IOException, FactoryFailureException {
+  public List<T> parse() throws IOException, FactoryFailureException {
 
     // Parse line by line, passing into create method and then adding this to our returnList
 
@@ -71,5 +76,4 @@ public class CSVParser<T> {
 
     return returnList;
   }
-  ;
 }
