@@ -2,6 +2,8 @@ package edu.brown.cs.student.main.server;
 
 import static spark.Spark.after;
 
+import edu.brown.cs.student.main.census.CacheProxy;
+import edu.brown.cs.student.main.census.CachingCensusDatasource;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import spark.Spark;
@@ -23,7 +25,7 @@ public class Server {
     Spark.get("loadcsv", loadHandler);
     CensusHandler censusHandler = new CensusHandler();
     censusHandler.getStateCodes();
-    Spark.get("broadband", censusHandler);
+    Spark.get("broadband", new CacheProxy(censusHandler, new CachingCensusDatasource()));
     Spark.get(
         "viewcsv",
         (req, res) -> new ViewHandler(loadHandler.getLoadedCSV().getFirst()).handle(req, res));
