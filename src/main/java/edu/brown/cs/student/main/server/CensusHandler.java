@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;
 
+<<<<<<< HEAD
   /**
    * Handles the Census-related request.
    *
@@ -39,6 +40,15 @@ public class CensusHandler implements Route {
   @Override
   public Object handle(Request request, Response response) throws Exception {
     Set<String> params = request.queryParams();
+=======
+  public CensusHandler() throws URISyntaxException, IOException, InterruptedException {
+    this.getStateCodes();
+  }
+
+  @Override
+  public Object handle(Request request, Response response) throws Exception {
+
+>>>>>>> 4a481670b5d2244dd6c79a8374dee7320f6a3785
     String state = request.queryParams("state");
     String county = request.queryParams("county");
 
