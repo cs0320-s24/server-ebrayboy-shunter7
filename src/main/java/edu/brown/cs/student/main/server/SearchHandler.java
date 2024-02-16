@@ -4,15 +4,17 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.csv.FactoryFailureException;
 import edu.brown.cs.student.main.csv.search.SearchCSV;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import kotlin.Pair;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SearchHandler implements Route {
   private final Pair<List<List<String>>, List<String>> parsedCSV;
@@ -27,13 +29,15 @@ public class SearchHandler implements Route {
       return new SearchFailResponse().serialize();
     }
 
-    Map<String, Object> responseMap = new HashMap<>();
-
+    Set<String> params = request.queryParams();
     String searchTarget = request.queryParams("searchTarget");
     String columnID = request.queryParams("columnID");
     String hasHeader = request.queryParams("hasHeader");
 
-    if (searchTarget.isEmpty() || hasHeader.isEmpty()) {
+    if (!params.contains("searchTarget")
+        || !params.contains("hasHeader")
+        || searchTarget.isEmpty()
+        || hasHeader.isEmpty()) {
       return new SearchFailResponse("error_bad_request").serialize();
     }
 
@@ -62,7 +66,17 @@ public class SearchHandler implements Route {
       searchResultsJson = this.sendRequest(searchTarget, Boolean.parseBoolean(hasHeader));
     }
 
+    Map<String, Object> responseMap = new HashMap<>();
+
+    responseMap.put("hasHeader", hasHeader);
+    responseMap.put("searchTarget", searchTarget);
+
+    if (columnID != null && !columnID.isEmpty()) {
+      responseMap.put("columnID", columnID);
+    }
+
     responseMap.put("data", searchResultsJson);
+
     return new SearchSuccessResponse(responseMap).serialize();
   }
 
@@ -72,10 +86,10 @@ public class SearchHandler implements Route {
     List<List<String>> cleanedParsedCSV = cleanParsedCSVData(this.parsedCSV.getFirst());
 
     return new SearchCSV(
-            new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()),
-            searchTarget,
-            columnID,
-            hasHeader)
+        new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()),
+        searchTarget,
+        columnID,
+        hasHeader)
         .search();
   }
 
@@ -85,10 +99,10 @@ public class SearchHandler implements Route {
     List<List<String>> cleanedParsedCSV = cleanParsedCSVData(this.parsedCSV.getFirst());
 
     return new SearchCSV(
-            new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()),
-            searchTarget,
-            columnID,
-            hasHeader)
+        new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()),
+        searchTarget,
+        columnID,
+        hasHeader)
         .search();
   }
 
@@ -98,7 +112,7 @@ public class SearchHandler implements Route {
     List<List<String>> cleanedParsedCSV = cleanParsedCSVData(this.parsedCSV.getFirst());
 
     return new SearchCSV(
-            new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()), searchTarget, hasHeader)
+        new Pair<>(cleanedParsedCSV, this.parsedCSV.getSecond()), searchTarget, hasHeader)
         .search();
   }
 

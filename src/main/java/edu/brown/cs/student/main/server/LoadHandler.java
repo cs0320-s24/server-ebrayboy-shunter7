@@ -3,11 +3,15 @@ package edu.brown.cs.student.main.server;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.main.csv.load.LoadCSV;
-import java.util.List;
 import kotlin.Pair;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LoadHandler implements Route {
 
@@ -18,13 +22,18 @@ public class LoadHandler implements Route {
   }
 
   public Object handle(Request request, Response response) {
+    Set<String> params = request.queryParams();
     String filePath = request.queryParams("filePath");
     String hasHeader = request.queryParams("hasHeader");
 
-    if (filePath.isEmpty() || hasHeader.isEmpty()) {
+    if (!params.contains("filePath")
+        || !params.contains("hasHeader")
+        || filePath.isEmpty()
+        || hasHeader.isEmpty()) {
       return new LoadFailureResponse("error_bad_request").serialize();
     }
 
+    Map<String, Object> responseMap = new HashMap<>();
     try {
       this.loadedCSV = this.sendRequest(filePath, Boolean.parseBoolean(hasHeader));
 
@@ -32,7 +41,9 @@ public class LoadHandler implements Route {
         return new LoadFailureResponse("error_datasource").serialize();
       }
 
-      return new LoadSuccessResponse(filePath).serialize();
+      responseMap.put("filepath", filePath);
+
+      return new LoadSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
       e.printStackTrace();
 
@@ -46,9 +57,9 @@ public class LoadHandler implements Route {
     return new Pair<>(loadcsv.parseCSV(), loadcsv.headerList);
   }
 
-  public record LoadSuccessResponse(String result, String filepath) {
-    public LoadSuccessResponse(String filepath) {
-      this("success", filepath);
+  public record LoadSuccessResponse(String result, Map<String, Object> response) {
+    public LoadSuccessResponse(Map<String, Object> response) {
+      this("success", response);
     }
 
     String serialize() {

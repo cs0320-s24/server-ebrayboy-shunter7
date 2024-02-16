@@ -2,13 +2,14 @@ package edu.brown.cs.student.main.server;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import spark.Request;
+import spark.Response;
+import spark.Route;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import spark.Request;
-import spark.Response;
-import spark.Route;
 
 public class ViewHandler implements Route {
 
@@ -19,7 +20,7 @@ public class ViewHandler implements Route {
   }
 
   @Override
-  public Object handle(Request request, Response response) throws Exception {
+  public Object handle(Request request, Response response) {
 
     if (this.parsedCSV == null || this.parsedCSV.isEmpty()) {
       return new ViewFailResponse().serialize();
@@ -34,8 +35,8 @@ public class ViewHandler implements Route {
   }
 
   public record ViewSuccessResponse(String result, Map<String, Object> response) {
-    public ViewSuccessResponse(Map<String, Object> data) {
-      this("success", data);
+    public ViewSuccessResponse(Map<String, Object> response) {
+      this("success", response);
     }
 
     String serialize() {

@@ -28,7 +28,6 @@ public class CensusHandler implements Route {
   @Override
   public Object handle(Request request, Response response) throws Exception {
     Set<String> params = request.queryParams();
-
     String state = request.queryParams("state");
     String county = request.queryParams("county");
 
@@ -71,9 +70,9 @@ public class CensusHandler implements Route {
             .uri(
                 new URI(
                     "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:"
-                        + county
-                        + "&in=state:"
-                        + state))
+                    + county
+                    + "&in=state:"
+                    + state))
             .GET()
             .build();
 
@@ -161,7 +160,7 @@ public class CensusHandler implements Route {
             .uri(
                 new URI(
                     "https://api.census.gov/data/2010/dec/sf1?get=NAME&for=county:*&in=state:"
-                        + stateCode))
+                    + stateCode))
             .GET()
             .build();
     HttpResponse<String> sentResponse =
