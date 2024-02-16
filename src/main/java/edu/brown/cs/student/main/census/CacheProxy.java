@@ -18,7 +18,7 @@ public class CacheProxy implements Route {
         cache
             .buildCache()
             .build(
-                new CacheLoader<String, String>() {
+                new CacheLoader<>() {
                   @Override
                   public String load(String key) throws Exception {
                     String[] params = key.split(",");

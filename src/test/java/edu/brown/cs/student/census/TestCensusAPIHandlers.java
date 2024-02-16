@@ -6,7 +6,6 @@ import edu.brown.cs.student.main.server.CensusHandler;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.Test;
-import spark.utils.Assert;
 
 public class TestCensusAPIHandlers {
   @Test

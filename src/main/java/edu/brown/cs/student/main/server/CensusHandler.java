@@ -3,6 +3,10 @@ package edu.brown.cs.student.main.server;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import spark.Request;
+import spark.Response;
+import spark.Route;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -10,38 +14,53 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import spark.Request;
-import spark.Response;
-import spark.Route;
 
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
+    Set<String> params = request.queryParams();
+
     String state = request.queryParams("state");
     String county = request.queryParams("county");
 
-    state = this.stateCodes.get(state);
-    county = findCountyCode(state, county);
+    if (!params.contains("state")
+        || !params.contains("county")
+        || state.isEmpty()
+        || county.isEmpty()) {
+      return new CensusFailResponse("error_bad_request").serialize();
+    }
+
+    String stateCode = this.stateCodes.get(state);
+    String countyCode = findCountyCode(stateCode, county);
 
     Map<String, Object> responseMap = new HashMap<>();
     try {
-      List<List<String>> censusJson = this.sendRequest(state, county);
+      List<List<String>> censusJson = this.sendRequest(stateCode, countyCode);
+
+      LocalDateTime myDateObj = LocalDateTime.now();
+      DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+      String formattedDate = myDateObj.format(myFormatObj);
 
       responseMap.put("data", censusJson);
+      responseMap.put("state", state);
+      responseMap.put("county", county);
+      responseMap.put("date-time-retrieved", formattedDate);
 
       return new CensusSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
       e.printStackTrace();
 
-      responseMap.put("result", "Exception");
+      return new CensusFailResponse().serialize();
     }
-    return responseMap;
   }
 
   public List<List<String>> sendRequest(String state, String county)
@@ -84,6 +103,24 @@ public class CensusHandler implements Route {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<CensusSuccessResponse> adapter = moshi.adapter(CensusSuccessResponse.class);
 
+        return adapter.toJson(this);
+      } catch (Exception e) {
+
+        e.printStackTrace();
+        throw e;
+      }
+    }
+  }
+
+  public record CensusFailResponse(String result) {
+    public CensusFailResponse() {
+      this("error_datasource");
+    }
+
+    String serialize() {
+      try {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<CensusFailResponse> adapter = moshi.adapter(CensusFailResponse.class);
         return adapter.toJson(this);
       } catch (Exception e) {
 
