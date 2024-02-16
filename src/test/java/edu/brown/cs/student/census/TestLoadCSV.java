@@ -18,7 +18,10 @@ public class TestLoadCSV {
   @Test
   void testLoad() {
     LoadHandler loadHandler = new LoadHandler();
-    Request request = makeRequest("/Users/elybrayboy/Desktop/server-ebrayboy-shunter7/data/census/dol_ri_earnings_disparity.csv", "true");
+    Request request =
+        makeRequest(
+            "/Users/elybrayboy/Desktop/server-ebrayboy-shunter7/data/census/dol_ri_earnings_disparity.csv",
+            "true");
     Response response = makeResponse();
     Object result = loadHandler.handle(request, response);
 
@@ -28,19 +31,17 @@ public class TestLoadCSV {
 
     try {
       Map<String, Object> map = jsonAdapter.fromJson(result.toString());
-      assertEquals("success" ,map.get("result"));
+      assertEquals("success", map.get("result"));
 
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-
   }
 
-  private Request makeRequest(String filePath, String hasHeader){
-    return new Request(){
+  private Request makeRequest(String filePath, String hasHeader) {
+    return new Request() {
       @Override
-      public String queryParams(String params){
+      public String queryParams(String params) {
         if (params.equals("filePath")) return filePath;
         else if (params.equals("hasHeader")) return hasHeader;
         return null;
@@ -48,10 +49,10 @@ public class TestLoadCSV {
     };
   }
 
-  private Response makeResponse(){
-    return new Response(){
+  private Response makeResponse() {
+    return new Response() {
       @Override
-      public void status(int statusCode){}
+      public void status(int statusCode) {}
     };
   }
 }
