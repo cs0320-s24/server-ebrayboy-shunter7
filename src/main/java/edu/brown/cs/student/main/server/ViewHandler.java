@@ -2,38 +2,38 @@ package edu.brown.cs.student.main.server;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class ViewHandler implements Route {
 
-  private List<ArrayList<String>> parsedCSV;
+  private final List<List<String>> parsedCSV;
 
-  public ViewHandler(List<ArrayList<String>> parsedCSV) {
+  public ViewHandler(List<List<String>> parsedCSV) {
     this.parsedCSV = parsedCSV;
   }
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
-    System.out.println(this.parsedCSV);
+
     if (this.parsedCSV == null || this.parsedCSV.isEmpty()) {
       return new ViewFailResponse().serialize();
     }
 
-    Map<String, Object> responseMap = new HashMap<>();
+    List<List<String>> cleanedData = cleanParsedCSVData(this.parsedCSV);
 
-    responseMap.put("csv", this.parsedCSV);
+    Map<String, Object> responseMap = new HashMap<>();
+    responseMap.put("data", cleanedData);
 
     return new ViewSuccessResponse(responseMap).serialize();
   }
 
-  private record ViewSuccessResponse(String result, Map<String, Object> data) {
+  public record ViewSuccessResponse(String result, Map<String, Object> response) {
     public ViewSuccessResponse(Map<String, Object> data) {
       this("success", data);
     }
@@ -42,6 +42,7 @@ public class ViewHandler implements Route {
       try {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<ViewSuccessResponse> adapter = moshi.adapter(ViewSuccessResponse.class);
+
         return adapter.toJson(this);
       } catch (Exception e) {
 
@@ -51,7 +52,7 @@ public class ViewHandler implements Route {
     }
   }
 
-  private record ViewFailResponse(String result) {
+  public record ViewFailResponse(String result) {
     public ViewFailResponse() {
       this("error_datasource");
     }
@@ -67,5 +68,18 @@ public class ViewHandler implements Route {
         throw e;
       }
     }
+  }
+
+  private List<List<String>> cleanParsedCSVData(List<List<String>> originalData) {
+    return originalData.stream()
+        .map(list -> list.stream().map(this::removeQuotesFromString).collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  private String removeQuotesFromString(String input) {
+    if (input.startsWith("\"") && input.endsWith("\"")) {
+      return input.substring(1, input.length() - 1);
+    }
+    return input;
   }
 }

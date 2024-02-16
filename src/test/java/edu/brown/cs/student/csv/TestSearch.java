@@ -15,13 +15,13 @@ public class TestSearch {
     Util testBasic =
         new Util(
             "/Users/sanya/cs0320/server-ebrayboy-shunter7/data/census/income_by_race.csv",
-            "White",
+            "asian",
             1,
             true);
     List<List<String>> getResults = testBasic.getResults();
     assertEquals(40, testBasic.getResults().size());
     for (List<String> ele : getResults) {
-      assertEquals("White", ele.get(1));
+      assertEquals("Asian", ele.get(1));
     }
   }
 

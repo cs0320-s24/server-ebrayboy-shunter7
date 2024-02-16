@@ -12,6 +12,7 @@ public class LoadCSV {
   private String filePath;
   private boolean hadHeader;
   private boolean hasLoaded;
+  public List<String> headerList;
 
   public LoadCSV(String filePath, boolean hadHeader) {
     this.filePath = filePath;
@@ -20,12 +21,15 @@ public class LoadCSV {
   }
   ;
 
-  public List<ArrayList<String>> parseCSV() {
-    List<ArrayList<String>> parsedCSV = new ArrayList<>();
+  public List<List<String>> parseCSV() {
+    List<List<String>> parsedCSV = new ArrayList<>();
     try {
       FileReader reader = new FileReader(this.filePath);
       DefaultRow row = new DefaultRow();
-      parsedCSV = new CSVParser<>(reader, row, this.hadHeader).Parse();
+      CSVParser<List<String>> parser = new CSVParser<>(reader, row, this.hadHeader);
+      parsedCSV = parser.Parse();
+      this.headerList = parser.headerList;
+
       this.hasLoaded = true;
       return parsedCSV;
     } catch (IOException e) {

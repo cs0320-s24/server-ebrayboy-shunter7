@@ -1,8 +1,10 @@
 package edu.brown.cs.student.main.csv;
 
-import edu.brown.cs.student.main.csv.search.Search;
+import edu.brown.cs.student.main.csv.search.SearchCSV;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import kotlin.Pair;
 
 /** Utility class that controls the overhead work of the program and is called directly from main */
 public class Util {
@@ -32,15 +34,27 @@ public class Util {
    */
   public List<List<String>> getResults() throws IOException, FactoryFailureException {
 
-    Search searcher;
+    SearchCSV searcher;
+    CSVParser<List<String>> parser =
+        new CSVParser<>(new FileReader(this.filename), new DefaultRow(), hasHeader);
     if (this.columnID == null) {
-      searcher = new Search(this.filename, this.searchTarget, this.hasHeader);
+      searcher =
+          new SearchCSV(
+              new Pair<>(parser.Parse(), parser.headerList), this.searchTarget, this.hasHeader);
     } else if (this.columnID instanceof String) {
       searcher =
-          new Search(this.filename, this.searchTarget, (String) this.columnID, this.hasHeader);
+          new SearchCSV(
+              new Pair<>(parser.Parse(), parser.headerList),
+              this.searchTarget,
+              (String) this.columnID,
+              this.hasHeader);
     } else {
       searcher =
-          new Search(this.filename, this.searchTarget, (Integer) this.columnID, this.hasHeader);
+          new SearchCSV(
+              new Pair<>(parser.Parse(), parser.headerList),
+              this.searchTarget,
+              (Integer) this.columnID,
+              this.hasHeader);
     }
     return searcher.search();
   }
