@@ -15,9 +15,12 @@ import java.util.Map;
 import javax.swing.plaf.nimbus.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+<<<<<<< HEAD
+=======
 import spark.Request;
 import spark.Response;
 import spark.utils.Assert;
+>>>>>>> 4a481670b5d2244dd6c79a8374dee7320f6a3785
 
 public class TestCensusAPIHandlers {
 
