@@ -37,40 +37,33 @@ public class SearchHandler implements Route {
       return new SearchFailResponse("error_bad_request").serialize();
     }
 
-    Integer columnIDInt = null;
-    String columnIDStr = null;
+    List<List<String>> searchResultsJson;
 
-    if (!columnID.isEmpty()) {
+    // Check if columnID is provided and parse it if present
+    if (columnID != null && !columnID.isEmpty()) {
+      Integer columnIDInt = null;
+      String columnIDStr = null;
       try {
         columnIDInt = Integer.valueOf(columnID);
       } catch (NumberFormatException e) {
         columnIDStr = columnID;
       }
-    }
 
-    try {
-      List<List<String>> searchResultsJson;
-
+      // Use the appropriate sendRequest method based on the type of columnID provided
       if (columnIDStr != null) {
         searchResultsJson =
             this.sendRequest(searchTarget, columnIDStr, Boolean.parseBoolean(hasHeader));
-      } else if (columnIDInt != null) {
-
+      } else {
         searchResultsJson =
             this.sendRequest(searchTarget, columnIDInt, Boolean.parseBoolean(hasHeader));
-      } else {
-
-        searchResultsJson = this.sendRequest(searchTarget, Boolean.parseBoolean(hasHeader));
       }
-
-      responseMap.put("data", searchResultsJson);
-
-      return new SearchSuccessResponse(responseMap).serialize();
-    } catch (Exception e) {
-      e.printStackTrace();
-
-      return new SearchFailResponse().serialize();
+    } else {
+      // If no columnID is provided, search across all columns
+      searchResultsJson = this.sendRequest(searchTarget, Boolean.parseBoolean(hasHeader));
     }
+
+    responseMap.put("data", searchResultsJson);
+    return new SearchSuccessResponse(responseMap).serialize();
   }
 
   public List<List<String>> sendRequest(String searchTarget, String columnID, boolean hasHeader)

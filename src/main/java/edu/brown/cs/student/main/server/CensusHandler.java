@@ -3,10 +3,6 @@ package edu.brown.cs.student.main.server;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -18,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;
@@ -45,7 +44,7 @@ public class CensusHandler implements Route {
     return responseMap;
   }
 
-  private List<List<String>> sendRequest(String state, String county)
+  public List<List<String>> sendRequest(String state, String county)
       throws URISyntaxException, IOException, InterruptedException {
 
     HttpRequest buildCensusApiRequest =
@@ -53,9 +52,9 @@ public class CensusHandler implements Route {
             .uri(
                 new URI(
                     "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:"
-                    + county
-                    + "&in=state:"
-                    + state))
+                        + county
+                        + "&in=state:"
+                        + state))
             .GET()
             .build();
 
@@ -125,7 +124,7 @@ public class CensusHandler implements Route {
             .uri(
                 new URI(
                     "https://api.census.gov/data/2010/dec/sf1?get=NAME&for=county:*&in=state:"
-                    + stateCode))
+                        + stateCode))
             .GET()
             .build();
     HttpResponse<String> sentResponse =
