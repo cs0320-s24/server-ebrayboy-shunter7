@@ -21,8 +21,13 @@ import spark.Route;
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;
 
+  public CensusHandler() throws URISyntaxException, IOException, InterruptedException {
+    this.getStateCodes();
+  }
+
   @Override
   public Object handle(Request request, Response response) throws Exception {
+
     String state = request.queryParams("state");
     String county = request.queryParams("county");
 
