@@ -11,7 +11,7 @@ we have four different handlers for each command: view, search, load, and census
 
 # Errors/Bugs
 
-There are no known errors or bugs currently. 
+We have 0 functional bugs/errors. However, when trying to make changed right before submitting, we can into some git problems, as seen from the repository. Our tests were running and passing, but after the issues, the only way we could build our project was to comment out the testing files. We have left the tests in there, and they all passed before we ran into git problems. 
 
 # Tests
 
