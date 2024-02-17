@@ -10,45 +10,76 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/** Handles Census-related requests and implements the Route interface. */
 public class CensusHandler implements Route {
   public Map<String, String> stateCodes;
 
-  public CensusHandler() throws URISyntaxException, IOException, InterruptedException {
-    this.getStateCodes();
-  }
-
+  /**
+   * Handles the Census-related request.
+   *
+   * @param request HTTP request
+   * @param response HTTP response
+   * @return Result of handling the request
+   * @throws Exception if an error occurs during handling
+   */
   @Override
   public Object handle(Request request, Response response) throws Exception {
-
+    Set<String> params = request.queryParams();
     String state = request.queryParams("state");
     String county = request.queryParams("county");
 
-    state = this.stateCodes.get(state);
-    county = findCountyCode(state, county);
+    if (!params.contains("state")
+        || !params.contains("county")
+        || state.isEmpty()
+        || county.isEmpty()) {
+      return new CensusFailResponse("error_bad_request").serialize();
+    }
+
+    String stateCode = this.stateCodes.get(state);
+    String countyCode = findCountyCode(stateCode, county);
 
     Map<String, Object> responseMap = new HashMap<>();
     try {
-      List<List<String>> censusJson = this.sendRequest(state, county);
+      List<List<String>> censusJson = this.sendRequest(stateCode, countyCode);
+
+      LocalDateTime myDateObj = LocalDateTime.now();
+      DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+      String formattedDate = myDateObj.format(myFormatObj);
 
       responseMap.put("data", censusJson);
+      responseMap.put("state", state);
+      responseMap.put("county", county);
+      responseMap.put("date-time-retrieved", formattedDate);
 
       return new CensusSuccessResponse(responseMap).serialize();
     } catch (Exception e) {
       e.printStackTrace();
 
-      responseMap.put("result", "Exception");
+      return new CensusFailResponse().serialize();
     }
-    return responseMap;
   }
 
+  /**
+   * Sends a request to the Census API and retrieves data.
+   *
+   * @param state State code
+   * @param county County code
+   * @return List of lists containing Census data
+   * @throws URISyntaxException if the URI is malformed
+   * @throws IOException if an I/O error occurs
+   * @throws InterruptedException if the operation is interrupted
+   */
   public List<List<String>> sendRequest(String state, String county)
       throws URISyntaxException, IOException, InterruptedException {
 
@@ -79,11 +110,23 @@ public class CensusHandler implements Route {
     return cleanParsedCSVData(data);
   }
 
+  /** Represents a successful response for Census data with a specific result and response map. */
   public record CensusSuccessResponse(String result, Map<String, Object> response) {
+    /**
+     * Constructs a CensusSuccessResponse with the provided response map, setting the result to
+     * "success".
+     *
+     * @param response Map containing response data
+     */
     public CensusSuccessResponse(Map<String, Object> response) {
       this("success", response);
     }
 
+    /**
+     * Serializes the CensusSuccessResponse to a JSON string using Moshi.
+     *
+     * @return JSON representation of the CensusSuccessResponse
+     */
     String serialize() {
       try {
         Moshi moshi = new Moshi.Builder().build();
@@ -98,6 +141,38 @@ public class CensusHandler implements Route {
     }
   }
 
+  /** Represents a failed response for Census data with a specific result. */
+  public record CensusFailResponse(String result) {
+    /** Constructs a CensusFailResponse with the default result "error_datasource". */
+    public CensusFailResponse() {
+      this("error_datasource");
+    }
+
+    /**
+     * Serializes the CensusFailResponse to a JSON string using Moshi.
+     *
+     * @return JSON representation of the CensusFailResponse
+     */
+    String serialize() {
+      try {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<CensusFailResponse> adapter = moshi.adapter(CensusFailResponse.class);
+        return adapter.toJson(this);
+      } catch (Exception e) {
+
+        e.printStackTrace();
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * Retrieves state codes from the Census API and populates the stateCodes map.
+   *
+   * @throws URISyntaxException if the URI is malformed
+   * @throws IOException if an I/O error occurs
+   * @throws InterruptedException if the operation is interrupted
+   */
   public void getStateCodes() throws URISyntaxException, IOException, InterruptedException {
     HttpRequest buildCensusApiRequest =
         HttpRequest.newBuilder()
@@ -122,6 +197,16 @@ public class CensusHandler implements Route {
     this.stateCodes = codes;
   }
 
+  /**
+   * Finds the Census county code based on the state code and county name.
+   *
+   * @param stateCode State code
+   * @param countyName County name
+   * @return Census county code
+   * @throws URISyntaxException if the URI is malformed
+   * @throws IOException if an I/O error occurs
+   * @throws InterruptedException if the operation is interrupted
+   */
   public static String findCountyCode(String stateCode, String countyName)
       throws URISyntaxException, IOException, InterruptedException {
     HttpRequest request =
@@ -148,12 +233,24 @@ public class CensusHandler implements Route {
     return "";
   }
 
+  /**
+   * Cleans the parsed CSV data by removing quotes from string elements.
+   *
+   * @param originalData Original data with quotes
+   * @return Cleaned data without quotes
+   */
   private List<List<String>> cleanParsedCSVData(List<List<String>> originalData) {
     return originalData.stream()
         .map(list -> list.stream().map(this::removeQuotesFromString).collect(Collectors.toList()))
         .collect(Collectors.toList());
   }
 
+  /**
+   * Removes quotes from the beginning and end of a string.
+   *
+   * @param input Input string with quotes
+   * @return String without quotes
+   */
   private String removeQuotesFromString(String input) {
     if (input.startsWith("\"") && input.endsWith("\"")) {
       return input.substring(1, input.length() - 1);

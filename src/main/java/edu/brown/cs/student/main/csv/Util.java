@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.List;
 import kotlin.Pair;
 
-/** Utility class that controls the overhead work of the program and is called directly from main */
+/**
+ * Utility class that controls the overhead work of the program and is called directly from main.
+ */
 public class Util {
   public final String filename;
   public final String searchTarget;
@@ -14,11 +16,13 @@ public class Util {
   public final Boolean hasHeader;
 
   /**
-   * @param filename name of the file to be parsed and searched
-   * @param searchTarget the desired string to be searched for in the data
-   * @param columnID an ID, either a String or an Integer that represents the column in which to
-   *     look for the search target
-   * @param hasHeader A boolean representing weather or not the file inputted has a header
+   * Constructs a Util object with specified parameters.
+   *
+   * @param filename Name of the file to be parsed and searched.
+   * @param searchTarget The desired string to be searched for in the data.
+   * @param columnID An ID, either a String or an Integer, representing the column in which to look
+   *     for the search target.
+   * @param hasHeader A boolean representing whether or not the file inputted has a header.
    */
   public Util(String filename, String searchTarget, Object columnID, Boolean hasHeader) {
     this.filename = filename;
@@ -28,9 +32,11 @@ public class Util {
   }
 
   /**
-   * @return Returns a list contains each row in which a searchTarget is found
-   * @throws IOException
-   * @throws FactoryFailureException
+   * Retrieves a list containing each row in which a searchTarget is found.
+   *
+   * @return A list containing each row in which a searchTarget is found.
+   * @throws IOException If there is an issue with I/O operations.
+   * @throws FactoryFailureException If there is a failure during factory operation.
    */
   public List<List<String>> getResults() throws IOException, FactoryFailureException {
 
@@ -40,18 +46,18 @@ public class Util {
     if (this.columnID == null) {
       searcher =
           new SearchCSV(
-              new Pair<>(parser.Parse(), parser.headerList), this.searchTarget, this.hasHeader);
+              new Pair<>(parser.parse(), parser.headerList), this.searchTarget, this.hasHeader);
     } else if (this.columnID instanceof String) {
       searcher =
           new SearchCSV(
-              new Pair<>(parser.Parse(), parser.headerList),
+              new Pair<>(parser.parse(), parser.headerList),
               this.searchTarget,
               (String) this.columnID,
               this.hasHeader);
     } else {
       searcher =
           new SearchCSV(
-              new Pair<>(parser.Parse(), parser.headerList),
+              new Pair<>(parser.parse(), parser.headerList),
               this.searchTarget,
               (Integer) this.columnID,
               this.hasHeader);
